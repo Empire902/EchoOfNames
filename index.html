@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>صدى الأسماء - سحر المعاني</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@200..1000&family=Reem+Kufi:wght@400..700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary-gold: #d4af37;
+        --night-sky: #0c1425;
+      }
+      body {
+        font-family: 'Cairo', sans-serif;
+        background-color: var(--night-sky);
+        margin: 0;
+        overflow-x: hidden;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .kufi {
+        font-family: 'Reem Kufi', sans-serif;
+      }
+      .poem-font {
+        font-family: 'Amiri', serif;
+      }
+      .desert-gradient {
+        background: radial-gradient(circle at top, #1a2a47 0%, #0c1425 70%, #c49a6c 120%);
+      }
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.5;
+        animation: twinkle var(--duration) infinite ease-in-out;
+      }
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.2; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.4); }
+      }
+      
+      @keyframes moon-float {
+        0%, 100% { transform: translateY(0) scale(1); filter: brightness(1); }
+        50% { transform: translateY(-10px) scale(1.05); filter: brightness(1.2); }
+      }
+      .moon-animated {
+        animation: moon-float 6s infinite ease-in-out;
+      }
+
+      /* Breathtaking Magical Reveal */
+      @keyframes breathtaking-reveal {
+        0% { 
+          opacity: 0; 
+          transform: scale(0.8) translateY(40px) rotateX(-15deg);
+          filter: blur(20px) brightness(2);
+          clip-path: circle(0% at 50% 50%);
+        }
+        40% {
+            opacity: 1;
+            filter: blur(10px) brightness(1.5);
+        }
+        100% { 
+          opacity: 1; 
+          transform: scale(1) translateY(0) rotateX(0deg);
+          filter: blur(0px) brightness(1);
+          clip-path: circle(150% at 50% 50%);
+        }
+      }
+      .breathtaking-reveal {
+        animation: breathtaking-reveal 1.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      }
+
+      /* Advanced Shimmer */
+      @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+      }
+      .gold-shimmer {
+        background: linear-gradient(90deg, #b48c00 0%, #facc15 50%, #b48c00 100%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 4s linear infinite;
+      }
+
+      @keyframes glow-pulse {
+        0%, 100% { text-shadow: 0 0 10px rgba(234, 179, 8, 0.2); }
+        50% { text-shadow: 0 0 25px rgba(234, 179, 8, 0.5); }
+      }
+      .label-glow {
+        animation: glow-pulse 3s ease-in-out infinite;
+      }
+
+      .stagger-1 { animation-delay: 0.1s; }
+      .stagger-2 { animation-delay: 0.25s; }
+      .stagger-3 { animation-delay: 0.4s; }
+      .stagger-4 { animation-delay: 0.55s; }
+      .stagger-5 { animation-delay: 0.7s; }
+
+      .reveal-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: breathtaking-reveal 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--night-sky);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #5d4037;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #8b6239;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
