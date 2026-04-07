@@ -9,6 +9,7 @@ export interface NameAnalysis {
   lastNameArabic: string;
   firstNameOrigin: string; // Geographical/Cultural origin
   lastNameOrigin: string;  // Geographical/Cultural origin
+  familyLegacy: string;    // New field for "Family Legacy"
 }
 
 export enum AppState {
