@@ -4,7 +4,7 @@ import { Background } from './components/Background';
 import { IslamicPattern } from './components/IslamicPattern';
 import { analyzeNames } from './services/geminiService';
 import { NameAnalysis, AppState } from './types';
-import * as htmlToImage from 'https://esm.sh/html-to-image';
+import * as htmlToImage from 'html-to-image';
 
 const App: React.FC = () => {
   const [firstName, setFirstName] = useState('');
