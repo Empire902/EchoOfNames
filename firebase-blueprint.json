@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "Analysis": {
+      "title": "Analysis",
+      "description": "A name analysis result",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who performed the analysis" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "analysis": { "type": "object", "description": "The full analysis result from Gemini" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "firstName", "lastName", "analysis", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/analyses/{analysisId}": {
+      "schema": "Analysis",
+      "description": "Collection of name analyses"
+    }
+  }
+}

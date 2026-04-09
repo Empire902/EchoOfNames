@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: analyses
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - The UID of the user who performed the analysis
+    //   - firstName: string (required)
+    //   - lastName: string (required)
+    //   - analysis: map (required) - The full analysis result from Gemini
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidAnalysis(data) {
+      return data.keys().hasAll(['userId', 'firstName', 'lastName', 'analysis', 'createdAt']) &&
+             data.userId is string &&
+             data.firstName is string && data.firstName.size() < 100 &&
+             data.lastName is string && data.lastName.size() < 100 &&
+             data.analysis is map &&
+             data.createdAt is timestamp;
+    }
+
+    match /analyses/{analysisId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId) && isValidAnalysis(request.resource.data);
+      allow delete: if isOwner(resource.data.userId);
+    }
+  }
+}

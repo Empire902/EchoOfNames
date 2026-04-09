@@ -156,18 +156,18 @@ export const Background: React.FC<{ children: React.ReactNode }> = ({ children }
 
       {/* Desert Dunes */}
       <div className="absolute bottom-0 w-full z-10 h-48 sm:h-64 pointer-events-none">
-        <svg viewBox="0 0 1440 320" className="absolute bottom-0 w-full h-full" preserveAspectRatio="none">
+        <svg viewBox="0 0 1440 400" className="absolute -bottom-10 w-[102%] -left-[1%] h-[120%]" preserveAspectRatio="none">
           <path 
             className="animate-dune-bright"
             fill="#8b6239" 
             fillOpacity="1" 
-            d="M0,224L80,202.7C160,181,320,139,480,144C640,149,800,203,960,197.3C1120,192,1280,128,1360,96L1440,64L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"
+            d="M0,224L80,202.7C160,181,320,139,480,144C640,149,800,203,960,197.3C1120,192,1280,128,1360,96L1440,64V400H0Z"
           ></path>
           <path 
             className="animate-dune-dark"
             fill="#5d4037" 
             fillOpacity="1" 
-            d="M0,256L60,240C120,224,240,192,360,197.3C480,203,600,245,720,245.3C840,245,960,203,1080,181.3C1200,160,1320,160,1380,160L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
+            d="M0,256L60,240C120,224,240,192,360,197.3C480,203,600,245,720,245.3C840,245,960,203,1080,181.3C1200,160,1320,160,1380,160L1440,160V400H0Z"
           ></path>
         </svg>
       </div>

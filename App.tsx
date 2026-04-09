@@ -104,7 +104,7 @@ const App: React.FC = () => {
 
   return (
     <Background>
-      <div className="w-full max-w-2xl px-4 py-8 flex flex-col items-center text-white min-h-screen">
+      <div className={`w-full max-w-2xl px-4 py-8 flex flex-col items-center text-white ${state === AppState.RESULT ? 'min-h-screen' : 'min-h-screen md:h-screen md:overflow-hidden justify-center'}`}>
         
         {/* Header UI */}
         <div className="text-center mb-8 mt-2 relative reveal-item stagger-1">
@@ -125,7 +125,6 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Fix: Removed redundant check 'state !== AppState.LOADING' which caused a TS error because IDLE|ERROR has no overlap with LOADING */}
         {(state === AppState.IDLE || state === AppState.ERROR) && (
           <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl rounded-[2rem] p-8 border border-yellow-700/30 shadow-2xl relative overflow-hidden reveal-item stagger-2">
             <IslamicPattern opacity={0.05} />
@@ -292,7 +291,7 @@ const App: React.FC = () => {
         )}
 
         {/* Website Footer Information */}
-        <div className="mt-16 mb-8 text-center text-yellow-200/40 text-xs relative z-20 reveal-item stagger-5">
+        <div className={`mt-16 mb-8 text-center text-yellow-200/40 text-xs relative z-20 reveal-item stagger-5 ${state === AppState.RESULT ? 'block' : 'md:hidden'}`}>
           <p className="text-xl font-black mb-2 text-yellow-100/90 drop-shadow-xl">تصميم وتنفيذ/ عمرو مصطفى</p>
           <p className="text-2xl font-black mb-2 text-yellow-500 drop-shadow-xl kufi">إشراف المعلم/ أحمد عطية</p>
           <p className="opacity-70 kufi text-sm tracking-[0.3em] font-medium mb-4">مشروع مادة اللغة العربية</p>
