@@ -33,13 +33,12 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDelay =
 
 export async function analyzeNames(firstName: string, lastName: string): Promise<NameAnalysis> {
   return withRetry(async () => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is required");
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    console.log('[gemini:key]', { present: true, length: apiKey.length, prefix: apiKey.slice(0, 4) });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `أنت خبير لغوي رفيع المستوى في علوم اللغة العربية، البلاغة، تاريخ العرب، ومعاجم اللغة. 
