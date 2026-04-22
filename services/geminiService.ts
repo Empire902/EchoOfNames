@@ -33,7 +33,7 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDelay =
 
 export async function analyzeNames(firstName: string, lastName: string): Promise<NameAnalysis> {
   return withRetry(async () => {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is required");
     }
