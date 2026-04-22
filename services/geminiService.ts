@@ -2,6 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { NameAnalysis } from "../types";
 
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
 /**
  * Retries a function with exponential backoff for specific transient errors.
  */
@@ -33,12 +35,6 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, initialDelay =
 
 export async function analyzeNames(firstName: string, lastName: string): Promise<NameAnalysis> {
   return withRetry(async () => {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is required");
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `أنت خبير لغوي رفيع المستوى في علوم اللغة العربية، البلاغة، تاريخ العرب، ومعاجم اللغة. 

@@ -30,7 +30,10 @@ const TransitionOverlay: React.FC<{ active: boolean }> = ({ active }) => {
   );
 };
 
-const QRModal: React.FC<{ isOpen: boolean; onClose: () => void; url: string }> = ({ isOpen, onClose, url }) => {
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase';
+
+const QRModal: React.FC<{ isOpen: boolean; onClose: () => void; url: string; isSaving?: boolean }> = ({ isOpen, onClose, url, isSaving }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -57,17 +60,23 @@ const QRModal: React.FC<{ isOpen: boolean; onClose: () => void; url: string }> =
               <p className="text-slate-400 text-sm">امسح الرمز لتحميل الوثيقة على هاتفك</p>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl shadow-inner group">
-              <QRCodeCanvas 
-                value={url} 
-                size={200}
-                level="H"
-                includeMargin={false}
-                imageSettings={{
-                  src: "/favicon.ico", 
-                  x: undefined, y: undefined, height: 40, width: 40, excavate: true,
-                }}
-              />
+            <div className="p-4 bg-white rounded-2xl shadow-inner group relative">
+              {isSaving ? (
+                <div className="w-[200px] h-[200px] flex items-center justify-center">
+                  <div className="animate-spin h-8 w-8 border-4 border-yellow-500 border-t-transparent rounded-full"></div>
+                </div>
+              ) : (
+                <QRCodeCanvas 
+                  value={url} 
+                  size={200}
+                  level="H"
+                  includeMargin={false}
+                  imageSettings={{
+                    src: "/favicon.ico", 
+                    x: undefined, y: undefined, height: 40, width: 40, excavate: true,
+                  }}
+                />
+              )}
             </div>
 
             <div className="w-full pt-4">
@@ -170,22 +179,48 @@ const App: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [isSharePage, setIsSharePage] = useState(false);
+  const [currentAnalysisId, setCurrentAnalysisId] = useState<string | null>(null);
+  const [isSavingToCloud, setIsSavingToCloud] = useState(false);
 
   const exportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const mode = params.get('mode');
-    const f = params.get('f');
-    const l = params.get('l');
+    const id = params.get('id');
 
-    if (mode === 'share' && f && l) {
+    if (mode === 'share' && id) {
       setIsSharePage(true);
-      setFirstName(f);
-      setLastName(l);
-      triggerAnalysis(f, l);
+      fetchAnalysisFromCloud(id);
     }
   }, []);
+
+  const fetchAnalysisFromCloud = async (id: string) => {
+    setState(AppState.LOADING);
+    try {
+      const docRef = doc(db, 'analyses', id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setAnalysis(data.analysis);
+        setFirstName(data.firstName);
+        setLastName(data.lastName);
+        setState(AppState.RESULT);
+        
+        // Auto-trigger download
+        setTimeout(() => {
+          handleExport();
+        }, 1500);
+      } else {
+        setErrorMsg('عذراً، لم نتمكن من العثور على هذه الوثيقة.');
+        setState(AppState.ERROR);
+      }
+    } catch (err) {
+      console.error("Error fetching analysis", err);
+      setErrorMsg('حدث خطأ أثناء تحميل البيانات.');
+      setState(AppState.ERROR);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -217,23 +252,41 @@ const App: React.FC = () => {
   const triggerAnalysis = async (f: string, l: string) => {
     setErrorMsg('');
     setState(AppState.LOADING);
+    setCurrentAnalysisId(null);
     try {
-      console.log('[analysis:start]', { firstName: f, lastName: l });
       const result = await analyzeNames(f, l);
-      console.log('[analysis:success]', result);
       setAnalysis(result);
       setState(AppState.RESULT);
-      
-      // Auto-trigger download if on share page
-      if (new URLSearchParams(window.location.search).get('mode') === 'share') {
-        setTimeout(() => {
-          handleExport();
-        }, 1500);
-      }
     } catch (err: any) {
-      console.error('[analysis:error]', err);
-      setErrorMsg(err?.message || 'حدث خطأ أثناء التحليل');
+      console.error(err);
       setState(AppState.ERROR);
+    }
+  };
+
+  const saveCurrentAnalysis = async () => {
+    if (!analysis || currentAnalysisId) return;
+    setIsSavingToCloud(true);
+    try {
+      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      await setDoc(doc(db, 'analyses', id), {
+        userId: 'anonymous', // Or handle actual auth if needed
+        firstName,
+        lastName,
+        analysis: analysis,
+        createdAt: serverTimestamp()
+      });
+      setCurrentAnalysisId(id);
+    } catch (err) {
+      console.error("Error saving analysis", err);
+    } finally {
+      setIsSavingToCloud(false);
+    }
+  };
+
+  const handleShowQR = async () => {
+    setShowQR(true);
+    if (!currentAnalysisId) {
+      await saveCurrentAnalysis();
     }
   };
 
@@ -250,13 +303,10 @@ const App: React.FC = () => {
     setIsRegenerating(true);
     setErrorMsg('');
     try {
-      console.log('[regenerate:start]', { firstName, lastName });
       const result = await analyzeNames(firstName, lastName);
-      console.log('[regenerate:success]', result);
       setAnalysis(result);
     } catch (err: any) {
-      console.error('[regenerate:error]', err);
-      setErrorMsg(err?.message || 'فشل إعادة التحليل');
+      console.error("Regeneration failed", err);
     } finally {
       setIsRegenerating(false);
     }
@@ -275,13 +325,12 @@ const App: React.FC = () => {
         cacheBust: true,
       });
 
-      console.log('[export:success]', { fileName: `صدى_الأسماء_${firstName}.png` });
       const link = document.createElement('a');
       link.download = `صدى_الأسماء_${firstName}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err: any) {
-      console.error('[export:error]', err);
+      console.error('Export failed', err);
     } finally {
       setIsExporting(false);
     }
@@ -299,7 +348,9 @@ const App: React.FC = () => {
     setErrorMsg('');
   };
 
-  const shareUrl = `${window.location.origin}${window.location.pathname}?mode=share&f=${encodeURIComponent(firstName)}&l=${encodeURIComponent(lastName)}`;
+  const shareUrl = currentAnalysisId 
+    ? `${window.location.origin}${window.location.pathname}?mode=share&id=${currentAnalysisId}`
+    : '';
 
   if (isSharePage && state === AppState.RESULT) {
     return (
@@ -311,10 +362,10 @@ const App: React.FC = () => {
             className="space-y-4"
           >
             <IslamicPattern opacity={0.1} />
-            <h1 className="text-5xl font-black text-yellow-500 kufi gold-shimmer">Echo of Names</h1>
-            <p className="text-xl text-yellow-100/80 kufi">Thank you for using Echo of Names</p>
+            <h1 className="text-5xl font-black text-yellow-500 kufi gold-shimmer">صدى الأسماء</h1>
+            <p className="text-xl text-yellow-100/80 kufi">شكراً لاستخدامك صدى الأسماء</p>
             <div className="pt-4">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 rounded-full text-yellow-500 text-sm animate-pulse">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 rounded-full text-yellow-500 text-sm animate-pulse font-bold">
                 <Download className="w-4 h-4" />
                 يتم الآن تحميل وثيقتك تلقائياً...
               </span>
@@ -325,7 +376,7 @@ const App: React.FC = () => {
             <ResultCard ref={exportRef} analysis={analysis} isExporting={true} />
           </div>
 
-          <button onClick={reset} className="px-8 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-all font-bold">
+          <button onClick={reset} className="px-8 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition-all font-bold kufi">
             العودة للرئيسية
           </button>
         </div>
@@ -336,7 +387,7 @@ const App: React.FC = () => {
   return (
     <Background>
       <TransitionOverlay active={isTransitioning} />
-      <QRModal isOpen={showQR} onClose={() => setShowQR(false)} url={shareUrl} />
+      <QRModal isOpen={showQR} onClose={() => setShowQR(false)} url={shareUrl} isSaving={isSavingToCloud} />
       
       <div className={`w-full max-w-2xl px-4 py-8 flex flex-col items-center text-white ${state === AppState.RESULT ? 'min-h-screen' : 'min-h-screen md:h-screen md:overflow-hidden justify-center'}`}>
         
@@ -452,7 +503,7 @@ const App: React.FC = () => {
                       {isExporting ? <span className="animate-pulse">جاري الحفظ...</span> : <><Download className="w-5 h-5" /> <span>حفظ الوثيقة</span></>}
                     </button>
                     <button
-                      onClick={() => setShowQR(true)}
+                      onClick={handleShowQR}
                       className="p-4 bg-slate-800/80 hover:bg-slate-700 border border-yellow-500/20 rounded-xl transition-all active:scale-95 group"
                       title="مشاركة عبر الرمز"
                     >
