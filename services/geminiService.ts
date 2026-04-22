@@ -39,6 +39,7 @@ export async function analyzeNames(firstName: string, lastName: string): Promise
     }
 
     const ai = new GoogleGenAI({ apiKey });
+    console.log('[gemini:key]', { present: true, length: apiKey.length, prefix: apiKey.slice(0, 4) });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `أنت خبير لغوي رفيع المستوى في علوم اللغة العربية، البلاغة، تاريخ العرب، ومعاجم اللغة. 
