@@ -2,7 +2,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { NameAnalysis } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+
+if (!apiKey) {
+  throw new Error("GEMINI_API_KEY is required");
+}
+
+const ai = new GoogleGenAI({ apiKey });
 
 /**
  * Retries a function with exponential backoff for specific transient errors.
