@@ -48,24 +48,73 @@ const ShootingStar: React.FC = () => {
   return <div className="shooting-star" style={style} />;
 };
 
+const WindParticle: React.FC = () => {
+  const [style, setStyle] = useState<React.CSSProperties>({ display: 'none' });
+
+  useEffect(() => {
+    const trigger = () => {
+      const top = Math.random() * 100;
+      const duration = 5 + Math.random() * 5;
+      setStyle({
+        top: `${top}%`,
+        left: '-10%',
+        '--duration': `${duration}s`,
+        display: 'block',
+      } as React.CSSProperties);
+      
+      setTimeout(() => setStyle({ display: 'none' }), duration * 1000);
+    };
+    const interval = setInterval(trigger, 2000 + Math.random() * 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <div className="wind-particle" style={style} />;
+};
+
 export const Background: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const stars = Array.from({ length: 60 });
   const shootingStars = Array.from({ length: 12 });
+  const windParticles = Array.from({ length: 10 });
 
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center desert-gradient overflow-hidden">
       <style>
         {`
+          @keyframes wind-drift {
+            0% { transform: translateX(0) scale(1); opacity: 0; }
+            20% { opacity: 0.3; }
+            80% { opacity: 0.3; }
+            100% { transform: translateX(110vw) scale(1.5); opacity: 0; }
+          }
+          .wind-particle {
+            position: absolute;
+            height: 1px;
+            width: 40px;
+            background: linear-gradient(90deg, transparent, rgba(234, 179, 8, 0.2), transparent);
+            animation: wind-drift var(--duration) linear forwards;
+            pointer-events: none;
+            z-index: 5;
+          }
           @keyframes dune-sway-up-down {
-            0%, 100% { transform: translateY(0); }
-            25% { transform: translateY(-15px); }
-            75% { transform: translateY(15px); }
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            25% { transform: translateY(-10px) scaleX(1.01); }
+            75% { transform: translateY(10px) scaleX(0.99); }
           }
           
           @keyframes dune-sway-down-up {
-            0%, 100% { transform: translateY(0); }
-            25% { transform: translateY(15px); }
-            75% { transform: translateY(-15px); }
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            25% { transform: translateY(10px) scaleX(0.99); }
+            75% { transform: translateY(-10px) scaleX(1.01); }
+          }
+
+          @keyframes moon-glow {
+            0%, 100% { opacity: 0.8; filter: blur(35px); transform: scale(1); }
+            50% { opacity: 1; filter: blur(45px); transform: scale(1.1); }
+          }
+
+          @keyframes moon-float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(5px, -10px); }
           }
 
           @keyframes text-from-sand {
@@ -129,14 +178,15 @@ export const Background: React.FC<{ children: React.ReactNode }> = ({ children }
       {/* Background Islamic Detailed Watermark */}
       <IslamicPattern opacity={0.03} fullScreen={true} />
       
-      {/* Background layer for stars */}
+      {/* Background layer for stars and elements */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {stars.map((_, i) => <Star key={i} />)}
         {shootingStars.map((_, i) => <ShootingStar key={i} />)}
+        {windParticles.map((_, i) => <WindParticle key={i} />)}
       </div>
       
       {/* Full Moon (Badr) */}
-      <div className="absolute top-10 left-10 w-24 h-24 moon-animated z-20 pointer-events-none">
+      <div className="absolute top-10 left-10 w-24 h-24 z-20 pointer-events-none" style={{ animation: 'moon-float 20s ease-in-out infinite' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_35px_rgba(255,253,208,0.8)]">
           <defs>
             <radialGradient id="moon-gradient" cx="50%" cy="50%" r="50%">
@@ -152,7 +202,10 @@ export const Background: React.FC<{ children: React.ReactNode }> = ({ children }
           <circle cx="30" cy="60" r="4" fill="#000" fillOpacity="0.02" />
         </svg>
       </div>
-      <div className="absolute top-8 left-8 w-28 h-28 rounded-full bg-yellow-100/15 blur-3xl moon-animated pointer-events-none"></div>
+      <div 
+        className="absolute top-8 left-8 w-28 h-28 rounded-full bg-yellow-100/15 pointer-events-none" 
+        style={{ animation: 'moon-glow 8s ease-in-out infinite, moon-float 20s ease-in-out infinite' }}
+      ></div>
 
       {/* Desert Dunes */}
       <div className="absolute bottom-0 w-full z-10 h-48 sm:h-64 pointer-events-none">

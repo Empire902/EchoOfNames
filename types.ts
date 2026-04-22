@@ -13,6 +13,7 @@ export interface NameAnalysis {
 }
 
 export enum AppState {
+  WELCOME = 'WELCOME',
   IDLE = 'IDLE',
   LOADING = 'LOADING',
   RESULT = 'RESULT',
