@@ -218,7 +218,9 @@ const App: React.FC = () => {
     setErrorMsg('');
     setState(AppState.LOADING);
     try {
+      console.log('[analysis:start]', { firstName: f, lastName: l });
       const result = await analyzeNames(f, l);
+      console.log('[analysis:success]', result);
       setAnalysis(result);
       setState(AppState.RESULT);
       
@@ -229,7 +231,8 @@ const App: React.FC = () => {
         }, 1500);
       }
     } catch (err: any) {
-      console.error(err);
+      console.error('[analysis:error]', err);
+      setErrorMsg(err?.message || 'حدث خطأ أثناء التحليل');
       setState(AppState.ERROR);
     }
   };
@@ -247,10 +250,13 @@ const App: React.FC = () => {
     setIsRegenerating(true);
     setErrorMsg('');
     try {
+      console.log('[regenerate:start]', { firstName, lastName });
       const result = await analyzeNames(firstName, lastName);
+      console.log('[regenerate:success]', result);
       setAnalysis(result);
     } catch (err: any) {
-      console.error("Regeneration failed", err);
+      console.error('[regenerate:error]', err);
+      setErrorMsg(err?.message || 'فشل إعادة التحليل');
     } finally {
       setIsRegenerating(false);
     }
@@ -269,12 +275,13 @@ const App: React.FC = () => {
         cacheBust: true,
       });
 
+      console.log('[export:success]', { fileName: `صدى_الأسماء_${firstName}.png` });
       const link = document.createElement('a');
       link.download = `صدى_الأسماء_${firstName}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err: any) {
-      console.error('Export failed', err);
+      console.error('[export:error]', err);
     } finally {
       setIsExporting(false);
     }
