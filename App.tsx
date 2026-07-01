@@ -160,7 +160,6 @@ const ResultCard = React.forwardRef<HTMLDivElement, { analysis: NameAnalysis | n
            <h4 className="text-yellow-500 font-black text-2xl kufi gold-shimmer tracking-widest mb-2">صدى الأسماء</h4>
            <div className="space-y-1">
              <p className="text-white text-base font-black tracking-[0.2em] uppercase">تصميم وتنفيذ/ عمرو مصطفى</p>
-             <p className="text-yellow-500 text-lg font-black kufi">إشراف المعلم/ أحمد عطية</p>
            </div>
         </div>
       </div>
@@ -412,7 +411,6 @@ const App: React.FC = () => {
               <div className="space-y-6 pt-8 border-t border-yellow-500/10 w-full max-w-md">
                 <div className="space-y-2">
                   <p className="text-xl font-black text-yellow-100/80 drop-shadow-md">تصميم وتنفيذ/ عمرو مصطفى</p>
-                  <p className="text-2xl font-black text-yellow-500 drop-shadow-md kufi">إشراف المعلم/ أحمد عطية</p>
                 </div>
                 
                 <button 
@@ -538,7 +536,6 @@ const App: React.FC = () => {
         {/* Website Footer Information - Added back */}
         <div className={`mt-16 mb-8 text-center text-yellow-200/40 text-xs relative z-20 transition-all ${state === AppState.RESULT ? 'block' : (state === AppState.WELCOME ? 'hidden' : 'md:hidden')}`}>
           <p className="text-xl font-black mb-2 text-yellow-100/90 drop-shadow-xl font-sans">تصميم وتنفيذ/ عمرو مصطفى</p>
-          <p className="text-2xl font-black mb-2 text-yellow-500 drop-shadow-xl kufi">إشراف المعلم/ أحمد عطية</p>
           <p className="opacity-70 kufi text-sm tracking-[0.3em] font-medium mb-4 uppercase">مشروع مادة اللغة العربية</p>
           <div className="w-20 h-px bg-gradient-to-r from-transparent via-yellow-600/40 to-transparent mx-auto mb-6"></div>
           <p className="text-lg text-yellow-600/90 font-bold kufi italic">
